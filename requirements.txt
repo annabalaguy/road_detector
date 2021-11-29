@@ -8,6 +8,11 @@ wheel>=0.29
 numpy
 pandas
 scikit-learn
+tensorflow
+tensorflow-addons
+PIL
+os
+sys
 
 # tests/linter
 black
@@ -21,6 +26,7 @@ gcsfs
 google-cloud-storage
 mlflow
 s3fs
+google.colab
 
 # utilities
 six>=1.14

@@ -1,60 +1,17 @@
 # --- Importation modules ---
 import os
-import sys
 import numpy as np
-import re
-import cv2
-import matplotlib.pyplot as plt
-import tensorflow as tf
-
 import IPython.display as display
 from PIL import Image
-import os
-import numpy as np
-
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.model_selection import train_test_split
 
 
 
-# ---Importation des données---
-
-
-# defining function for dataLoading function
-framObjTrain = {'img' : [],
-           'mask' : []
-          }
-
-def LoadData( frameObj = None, imgPath = None, maskPath = None, shape = 128):
-    imgNames = os.listdir(imgPath)
-    maskNames = []
-
-    ## generating mask names
-    for mem in imgNames:
-        mem = mem.split('_')[0]
-        if mem not in maskNames:
-            maskNames.append(mem)
-
-    imgAddr = imgPath + '/'
-    maskAddr = maskPath + '/'
-
-    for i in range (len(imgNames)):
-        try:
-            img = plt.imread(imgAddr + maskNames[i] + '_sat.jpg')
-            mask = plt.imread(maskAddr + maskNames[i] + '_mask.png')
-
-        except:
-            continue
-        img = cv2.resize(img, (shape, shape))
-        mask = cv2.resize(mask, (shape, shape))
-        frameObj['img'].append(img)
-        frameObj['mask'].append(mask[:,:,0]) # this is because its a binary mask and img is present in channel 0
-
-    return frameObj
-
+# --- IMPORTATION DES DONNEES ---
 # ---Connexion au drive où les données sont stockées---
 
-#mount drive
+#Lecture des fichiers dans Google drive
 from google.colab import drive;
 drive.mount('/content/drive')
 
@@ -108,10 +65,10 @@ def dim_reduction(list_mask):
     new_image = np.array(new_image)
     return new_image
 
-#Attribution des images test et des images train
+#Attribution des images test et des images train, definition d'un dictionnaire image, mask
 TestObjTrain = {'img':np.array(dir_img), 'mask':dir_mask}
 
-#TrainTestSplit
+#SPLIT DES DONNEES D'ENTRAÎNEMENT
 X_train, X_test, y_train, y_test = train_test_split(TestObjTrain['img'], TestObjTrain['mask'], test_size=0.3, random_state=1)
 
 
