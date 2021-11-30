@@ -1,8 +1,15 @@
-#baseline
+# --- Imports ---
+
 import math
 import random
 import numpy as np
 import tensorflow as tf
+import sys
+
+sys.path.append("data.py")
+from data import y_test, y_train
+
+#Création de l'IoU custom pour calculer manuellement la baseline
 
 def iou(y_true, y_pred):
     '''
