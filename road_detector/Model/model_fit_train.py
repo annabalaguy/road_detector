@@ -7,6 +7,7 @@ from tensorflow.keras.optimizers import Adam
 from model import GiveMeUnet
 from losses import binary_crossentropy_gaussian
 from metrics import custom_mse, bruno_metric, custom_mae
+import joblib
 
 sys.path.append("data.py")
 from data import y_test, y_train, X_test_pad, X_train_pad
@@ -36,3 +37,4 @@ unet.evaluate(X_test_pad, y_test, verbose=1)
 
 
 #PLOT HISTORY ??
+#Importer modèle avec joblib ??

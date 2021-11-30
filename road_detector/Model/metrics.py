@@ -1,8 +1,7 @@
 # --- IMPORTS ---
 
 import tensorflow as tf
-import tensorflow_addons
-from tensorflow_addons import image
+import tensorflow_addons as tfa
 from tensorflow_addons.image import gaussian_filter2d
 from tensorflow.keras import metrics
 
@@ -35,23 +34,24 @@ def binarization(y_pred, threshold):
 # --- METRICS ---
 
 
-#custom metric with gaussian filter
+#Vincent metrics
+def binarize(array, threshold):
+    tmp = tf.convert_to_tensor(array)
+    tmp = tf.cast(tf.math.greater(tmp, threshold), 'float32')
+    return tmp
 
-def bruno_metric(y_true, y_pred):
-    y_pred = binarization(y_pred, 0.001)
 
-    y_true = tf.cast(tf.convert_to_tensor(y_true), "float")
-    y_pred = tf.cast(tf.convert_to_tensor(y_pred), "float")
-
-    y_true = gaussian_filter2d(y_true, sigma=4)
-    y_pred = gaussian_filter2d(y_pred, sigma=4)
-
-    y_true = tf.constant(y_true, dtype='float')
-    y_pred = tf.constant(y_pred, dtype='float')
-    #diviser par union: somme des 1 dans le pred et dans le true
-    return tf.reduce_sum(tf.math.abs(y_true - y_pred)) / (len(y_true) *
-                                                          (128 * 128))
-
+#continuous_iou
+def vincent_metric(y_true, y_pred, sigma=(4.0, 4.0)):
+    y_true = tf.cast(tf.convert_to_tensor(y_true), 'float32')
+    y_pred = tf.cast(tf.convert_to_tensor(y_pred), 'float32')
+    bin_pred = binarize(y_pred, .5)
+    gf_true = tfa.image.gaussian_filter2d(y_true, sigma=sigma)
+    gf_pred = tfa.image.gaussian_filter2d(bin_pred, sigma=sigma)
+    y_true = tf.cast(gf_true, dtype='float32')
+    y_pred = tf.cast(gf_pred, dtype='float32')
+    return tf.math.reduce_sum(tf.math.abs(tf.math.subtract(
+        gf_true, gf_pred))) / tf.math.reduce_sum(y_true + bin_pred)
 
 #MSE with gaussian filter
 def custom_mse(y_true, y_pred):
@@ -69,12 +69,10 @@ def custom_mse(y_true, y_pred):
 
 #MAE with gaussian filter
 def custom_mae(y_true, y_pred):
-    #binarize
-    by_pred = binarization(y_pred, 0.001)
 
-    #gaussian blur
-    gf_pred = gaussian_filter2d(by_pred, sigma=4)
+    gf_pred = gaussian_filter2d(y_pred, sigma=4)
     gf_true = gaussian_filter2d(y_true, sigma=4)
+    # gf_true = y_true
 
     loss = metrics.mean_absolute_error(y_true=gf_true, y_pred=gf_pred)
     return loss
