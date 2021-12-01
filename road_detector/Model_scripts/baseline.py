@@ -54,8 +54,7 @@ y_true = y_test
 list_iou = []
 list_mae = []
 for i in range(len(y_true)):
-    list_iou.append(float(iou(y_true[i], baseline_generation(128).reshape(128, 128, 1))))
-    # list_mae.append(float(.metrics.mean_absolute_error(y_true[i], baseline_generation(128).reshape(128, 128, 1))))
+    list_iou.append(float(iou(y_true[i], baseline_generation(256).reshape(256, 256, 1))))
 
 print("Baseline IoU: ", np.mean(list_iou))
 # print("Baseline MAE: ", np.mean(list_mae))

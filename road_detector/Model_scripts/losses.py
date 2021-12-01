@@ -14,7 +14,7 @@ from tensorflow.keras import losses
 #Binary crossentropy with gaussian filter
 def binary_crossentropy_gaussian(y_true, y_pred):
     gf_pred = gaussian_filter2d(y_pred, sigma=4)
-    gf_true = tf.constant(y_true, dtype='float')
+    gf_true = tf.constant(y_true, dtype='int64')
 
     bce = tf.keras.losses.BinaryCrossentropy(from_logits=False)
     loss = bce(gf_true, gf_pred)

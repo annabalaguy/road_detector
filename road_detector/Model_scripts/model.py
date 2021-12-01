@@ -2,12 +2,11 @@
 
 import tensorflow as tf
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-from metrics import custom_mse, bruno_metric, custom_mae
+from metrics import custom_mse, metrics_continuous_iou, custom_mae
 
 import sys
 
 sys.path.append("data.py")
-from data import y_test, y_train, X_test_pad, X_train_pad
 
 
 # --- DEFINITION DU MODELE U-NET ---
@@ -42,7 +41,7 @@ def Conv2dBlock(inputTensor, numFilters, kernelSize = 3, doBatchNorm = True):
 #Each Decoder layer is composed of 4 units, with a skip, and a convolution in order to lower the dimensions because of the informations gained thanks to the skip.
 
 
-filters=16
+filters=64
 
 def GiveMeUnet(inputImage, numFilters = filters, droupouts = 0.1, doBatchNorm = True):
     # defining encoder Path
@@ -58,18 +57,18 @@ def GiveMeUnet(inputImage, numFilters = filters, droupouts = 0.1, doBatchNorm = 
     p3 = tf.keras.layers.MaxPooling2D((2,2))(c3)
     p3 = tf.keras.layers.Dropout(droupouts)(p3)
 
-    c4 = Conv2dBlock(p3, numFilters * 8, kernelSize = 3, doBatchNorm = doBatchNorm)
+    c4 = Conv2dBlock(p3, numFilters * 8, kernelSize = 2, doBatchNorm = doBatchNorm)
     p4 = tf.keras.layers.MaxPooling2D((2,2))(c4)
     p4 = tf.keras.layers.Dropout(droupouts)(p4)
 
     # Bottle neck
-    c5 = Conv2dBlock(p4, numFilters * 16, kernelSize = 3, doBatchNorm = doBatchNorm)
+    c5 = Conv2dBlock(p4, numFilters * 16, kernelSize = 2, doBatchNorm = doBatchNorm)
 
     # defining decoder path
     u6 = tf.keras.layers.Conv2DTranspose(numFilters*8, (3, 3), strides = (2, 2), padding = 'same')(c5)
     u6 = tf.keras.layers.concatenate([u6, c4])
     u6 = tf.keras.layers.Dropout(droupouts)(u6)
-    c6 = Conv2dBlock(u6, numFilters * 8, kernelSize = 3, doBatchNorm = doBatchNorm)
+    c6 = Conv2dBlock(u6, numFilters * 8, kernelSize = 2, doBatchNorm = doBatchNorm)
 
     u7 = tf.keras.layers.Conv2DTranspose(numFilters*4, (3, 3), strides = (2, 2), padding = 'same')(c6)
     u7 = tf.keras.layers.concatenate([u7, c3])

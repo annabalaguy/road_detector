@@ -7,19 +7,21 @@ from tensorflow.keras.optimizers import Adam
 from model import GiveMeUnet
 from losses import binary_crossentropy_gaussian
 from metrics import custom_mse, custom_mae, metrics_continuous_iou
+from tensorflow.keras.optimizers.schedules import ExponentialDecay
 
 sys.path.append("data.py")
 from data import y_test, y_train, X_test_pad, X_train_pad
 
+lr_schedule = ExponentialDecay(
+    initial_learning_rate=0.001, decay_steps=5000, decay_rate=0.7)
+
 ## instantiating model
-inputs = tf.keras.layers.Input((128, 128, 3))
+inputs = tf.keras.layers.Input((256, 256, 3))
 
 unet = GiveMeUnet(inputs, droupouts= 0.07)
+adam = tf.keras.optimizers.Adam(learning_rate=lr_schedule)
+unet.compile(optimizer = adam, loss = binary_crossentropy_gaussian, metrics=[metrics_continuous_iou, custom_mae], run_eagerly=True)
 
-#optimisation du Adam
-adam = tf.keras.optimizers.Adam(learning_rate=0.001)
-#Compilation
-unet.compile(optimizer = adam, loss = binary_crossentropy_gaussian, metrics=[custom_mse, custom_mae], run_eagerly=True)
 
 #Fit and train the model
 

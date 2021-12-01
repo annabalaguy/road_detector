@@ -6,30 +6,6 @@ from tensorflow_addons.image import gaussian_filter2d
 from tensorflow.keras import metrics
 
 #Definition de la binarisation pour le calcul des métriques
-def binarization(y_pred, threshold):
-    y_pred = y_pred.numpy()
-    print(type(y_pred))
-    print(y_pred.shape)
-    batch_size = y_pred.shape[0]
-    thresh = threshold
-    binarized = []
-
-    for image in y_pred:
-        row = []
-        for row in image:
-            col = []
-            for col in row:
-                value = y_pred[row][col]
-                if value > threshold:
-                    value = 1
-                else:
-                    value = 0
-                col.append(value)
-            row.append(col)
-        binarized.append(row)
-
-    return tf.constant(binarized, dtype='int')
-
 
 # --- METRICS ---
 
