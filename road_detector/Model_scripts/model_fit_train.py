@@ -6,8 +6,7 @@ from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.optimizers import Adam
 from model import GiveMeUnet
 from losses import binary_crossentropy_gaussian
-from metrics import custom_mse, bruno_metric, custom_mae
-import joblib
+from metrics import custom_mse, custom_mae, metrics_continuous_iou
 
 sys.path.append("data.py")
 from data import y_test, y_train, X_test_pad, X_train_pad
@@ -20,7 +19,7 @@ unet = GiveMeUnet(inputs, droupouts= 0.07)
 #optimisation du Adam
 adam = tf.keras.optimizers.Adam(learning_rate=0.001)
 #Compilation
-unet.compile(optimizer = adam, loss = binary_crossentropy_gaussian, metrics=[custom_mse, bruno_metric, custom_mae,'Precision', 'Recall'], run_eagerly=True)
+unet.compile(optimizer = adam, loss = binary_crossentropy_gaussian, metrics=[custom_mse, custom_mae], run_eagerly=True)
 
 #Fit and train the model
 
@@ -32,6 +31,7 @@ retVal = unet.fit(X_train_pad, y_train,
                   verbose = 1,
                   batch_size=16,
                   callbacks=[es])
+
 
 unet.evaluate(X_test_pad, y_test, verbose=1)
 

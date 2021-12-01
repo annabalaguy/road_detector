@@ -12,8 +12,8 @@ from sklearn.model_selection import train_test_split
 # ---Connexion au drive où les données sont stockées---
 
 #Lecture des fichiers dans Google drive
-from google.colab import drive;
-drive.mount('/content/drive')
+#from google.colab import drive;
+#drive.mount('/content/drive')
 
 
 #Definition du chemin d'accès pour importer les données
@@ -26,7 +26,7 @@ nb_images=1200 #Nombre d'images à charger variable
 
 for image in images_list[:nb_images] :
     Myimage = Image.open(path+image)
-    Myimage = Myimage.resize((128,128),Image.ANTIALIAS)
+    Myimage = Myimage.resize((256,256),Image.ANTIALIAS)
     if 'mask' in image:
         thresh = 10
         fn = lambda x : 255 if x > thresh else 0
@@ -76,7 +76,7 @@ X_train, X_test, y_train, y_test = train_test_split(TestObjTrain['img'], TestObj
 
 
 #RESHAPE Y
-y_train = y_train.reshape((420, 128, 128, 1))
+y_train = y_train.reshape((420, 256, 256, 1))
 y_test = y_test.reshape((180, 128, 128, 1))
 
 #PAD X POUR GARDER BONNES DIM

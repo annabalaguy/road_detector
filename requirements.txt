@@ -3,6 +3,7 @@ pip>=9
 setuptools>=26
 twine
 wheel>=0.29
+python-multipart
 
 # data science
 numpy
@@ -10,9 +11,9 @@ pandas
 scikit-learn
 tensorflow
 tensorflow-addons
-PIL
-os
-sys
+Pillow
+IPython
+matplotlib
 
 # tests/linter
 black
@@ -26,7 +27,8 @@ gcsfs
 google-cloud-storage
 mlflow
 s3fs
-google.colab
+uvicorn
+fastapi
 
 # utilities
 six>=1.14

@@ -42,7 +42,7 @@ def binarize(array, threshold):
 
 
 #continuous_iou
-def vincent_metric(y_true, y_pred, sigma=(4.0, 4.0)):
+def metrics_continuous_iou(y_true, y_pred, sigma=(4.0, 4.0)):
     y_true = tf.cast(tf.convert_to_tensor(y_true), 'float32')
     y_pred = tf.cast(tf.convert_to_tensor(y_pred), 'float32')
     bin_pred = binarize(y_pred, .5)
@@ -53,13 +53,10 @@ def vincent_metric(y_true, y_pred, sigma=(4.0, 4.0)):
     return tf.math.reduce_sum(tf.math.abs(tf.math.subtract(
         gf_true, gf_pred))) / tf.math.reduce_sum(y_true + bin_pred)
 
+
 #MSE with gaussian filter
 def custom_mse(y_true, y_pred):
-    #binarize
-    by_pred = binarization(y_pred, 0.001)
-
-    #gaussian pred
-    gf_pred = gaussian_filter2d(by_pred, sigma=4)
+    gf_pred = gaussian_filter2d(y_pred, sigma=4)
     gf_true = gaussian_filter2d(y_true, sigma=4)
     # gf_true = y_true
 
