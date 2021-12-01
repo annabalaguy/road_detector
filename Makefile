@@ -57,3 +57,45 @@ pypi:
 
 run_api:
 	uvicorn api.fast:app --reload
+
+# ----------------------------------
+#      				GCP CONFIG
+# ----------------------------------
+
+# project id
+PROJECT_ID=wagon-328013
+BUCKET_NAME =wagon-data-722-road-detector
+REGION=europe-west1
+
+set_project:
+	-@gcloud config set project ${PROJECT_ID}
+
+
+##### Training  - - - - - - - - - - - - - - - - - - - - - -
+
+BUCKET_TRAINING_FOLDER = 'trainings'
+
+### GCP AI Platform - - - - - - - - - - - - - - - - - - - -
+
+PYTHON_VERSION=3.7
+FRAMEWORK=tensorflow
+RUNTIME_VERSION=2.5
+
+##### Package params  - - - - - - - - - - - - - - - - - - -
+
+PACKAGE_NAME=road_detector
+FILENAME=trainer
+
+##### Job - - - - - - - - - - - - - - - - - - - - - - - - -
+
+JOB_NAME=  # A COMPLETER
+
+gcp_submit_training:
+	gcloud ai-platform jobs submit training ${JOB_NAME} \
+		--job-dir gs://${BUCKET_NAME}/${BUCKET_TRAINING_FOLDER} \
+		--package-path ${PACKAGE_NAME} \
+		--module-name ${PACKAGE_NAME}.${FILENAME} \
+		--python-version=${PYTHON_VERSION} \
+		--runtime-version=${RUNTIME_VERSION} \
+		--region ${REGION} \
+		--stream-logs
