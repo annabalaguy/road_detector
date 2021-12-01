@@ -29,14 +29,15 @@ def get_data_from_gcp(nrows=12453, **kwargs):
     # Images' extraction
     client = storage.Client()
     bucket = client.bucket(BUCKET_NAME)
-    blobs = bucket.list_blobs(prefix="Data/train/100034")
+    blobs = bucket.list_blobs(prefix="Data/train/")
     for blob in blobs :
         if os.path.basename(blob.name) == "":
             continue
-        blob.download_to_filename(os.path.basename(blob.name))
+        blob.download_to_filename(blob.name)
+        #blob.download_to_filename(os.path.basename(blob.name))
     #Creation of a dictionnary
     nb_image = nrows
-    images_list = os.listdir()
+    images_list = os.listdir("Data/train")
     for image in images_list[:nb_image]:
         Myimage = Image.open(image)
         #Resizing
