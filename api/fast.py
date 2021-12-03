@@ -1,59 +1,53 @@
 from fastapi import FastAPI
 from tensorflow.keras import models
 from tensorflow.python.keras.preprocessing.sequence import pad_sequences
-from road_detector.Model_scripts.losses import binary_crossentropy_gaussian
-from road_detector.Model_scripts.metrics import metrics_continuous_iou, custom_mae
-import base64
 import numpy as np
 from pydantic import BaseModel
-from road_detector.Model_scripts.helpers import make_image_api_friendly
-
-#désinstaller environnement
-#nouvel envmt virtuel
-#Nvel pip install
-
+from api.helpers import image_from_dict, image_to_dict, binarize_predictions, display_resized_prediction
+from road_detector.unet import GiveMeUnet
 app = FastAPI()
-path_local_model='/Users/loulou/code/annabalaguy/road_detector/road_detector/BasicRouteGenerator.h5'
-model = models.load_model(path_local_model,
-                          custom_objects={
-                              "binary_crossentropy_gaussian":
-                              binary_crossentropy_gaussian,
-                              "metrics_continuous_iou": metrics_continuous_iou, "custom_mae":custom_mae
-                          })
+LOCAL_Weights = 'WEIGHTS_Vincent_Halfdata_Crossentropy.h5'
+#/Users/loulou/code/annabalaguy/road-api/road_detector/WEIGHTS_Vincent_Jaccard_Crossentropy.h5
+unet = GiveMeUnet()
+unet.load_weights(LOCAL_Weights)
 
 #Upload de l'Image par l'utilisateur
 
-
 class Item(BaseModel):
     image: str
+    size : int
     height: int
     width: int
     channel: int
 
 @app.get("/")
 def test():
-    return "OK"
+    return {"status": "OK"}
 
 @app.post("/predict")
 async def prediction(item:Item):
-    # Decode received string from bytes
-    bytes_string = bytes(item.image, 'utf-8')
-    # Decode from b64
-    decoded_string = base64.b64decode(bytes_string)
-    # Convert to numpy array and force uint8 to match initial type
-    img = np.frombuffer(decoded_string, dtype='uint8')
-    # Reshape to original shape
-    img = img.reshape((item.height, item.width, item.channel))
+    #Conversion de l'image en nparray
+    img = image_from_dict(item, dtype='float32')
 
-    # possibilité de faire preproc + preidct à cet endroit
-    img=pad_sequences(img)
-    predict_img=model.predict(img)
+    # Preproc + predict à cet endroit
+    #img=pad_sequences(img)
 
-    image_predite=make_image_api_friendly(predict_img)
+    #Prediction de l'image
+
+    predict_img=unet.predict(img)
+
+    #Conversion du nparray en image str lisible pour l'API
+
+    #pred_binary_img=binarize_predictions(predict_img)
+    #pred_resized_img=display_resized_prediction(pred_binary_img)
+
+    image_predite = image_to_dict(predict_img, dtype='float16')
+
+
+    # TO DO: Option to convert tf to np -> prediction.numpy()
+    # TO DO: Option to unscale *255 -> prediction * 255
 
     return image_predite
-
-#prendre l'image en str puis la transformer en ?? grâce à PIL, puis la transformer en array puis liste pour lecture modele
 
 
 @app.get("/test")
