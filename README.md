@@ -1,4 +1,5 @@
-# Source of the dataset
+# Citation
+Source of the dataset:
 ```@InProceedings{DeepGlobe18,
  author = {Demir, Ilke and Koperski, Krzysztof and Lindenbaum, David and Pang, Guan and Huang, Jing and Basu, Saikat and Hughes, Forest and Tuia, Devis and Raskar, Ramesh},
  title = {DeepGlobe 2018: A Challenge to Parse the Earth Through Satellite Images},
